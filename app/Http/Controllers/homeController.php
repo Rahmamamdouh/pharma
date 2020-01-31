@@ -4,44 +4,30 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class homeController extends Controller
+class HomeController extends Controller
 {
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
 
-public function welcome(){
-		
-		return view('welcome');
-
-	}
-
-
-public function about(){
-		
-		return view('pharmaAbout');
-
-	}
-	
-	public function cart(){
-		
-		return view('pharmaCart');
-
-	}
-	
-	public function checkout(){
-		
-		return view('pharmaCheckout');
-
-	}
-	
-	public function contact(){
-		
-		return view('pharmaContact');
-
-	}
-	
-	public function index(){
-		
-		 return view('pharmaIndex');
-
-	}
-	
+    /**
+     * Show the application dashboard.
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function index()
+    {
+        return view('home');
+    }
+	// it was send to laravel page when write view welcome but know it send to index page after click login
+	public function welcome()
+    {
+        return view('home');
+    }
 }

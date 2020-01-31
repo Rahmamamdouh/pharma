@@ -13,10 +13,19 @@
 
 
 Route::get('/','homeController@welcome');
-Route::get('/about','homeController@about');
-Route::get('/cart','homeController@cart');
-Route::get('/checkout','homeController@checkout');
-Route::get('/contact','homeController@contact');
 Route::get('/index','homeController@index');
+Route::get('/about','customerController@about');
+Route::get('/cart','customerController@cart');
+Route::get('/checkout','customerController@checkout');
+Route::get('/contact','customerController@contact');
+Route::get('/index','customerController@index');
+Route::get('/store','customerController@store');
+
+Route::get('/thankyou','customerController@thankyou');
 
 
+
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');

@@ -55,6 +55,12 @@ P.blocktext {
 		 
             <nav class="site-navigation text-right text-md-center" role="navigation">
               <ul class="site-menu js-clone-nav d-none d-lg-block">
+			@guest
+			<li><a  href="/register">register</a></li>
+			<li><a  href="/login">login</a></li>
+			@else
+			<li><a  href="login">logout</a></li>
+			@endguest
                 <li><a  href="/index">Home</a></li>
                 <li><a  href="/store">Store</a></li>
                 <li class="has-children">
@@ -77,10 +83,12 @@ P.blocktext {
                 </li>
                 <li class="active"><a  href="/about">About</a></li>
                 <li><a  href="/contact">Contact</a></li>
+				<li><a  href="/cart">cart</a></li>
               </ul>
             </nav>
 			
           </div>
+		  
 		  
 		  @yield('main-content')
     <footer class="site-footer">
