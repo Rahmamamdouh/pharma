@@ -25,9 +25,10 @@ class HomeController extends Controller
     {
         return view('home');
     }
-	// it was send to laravel page when write view welcome but know it send to index page after click login
-	public function welcome()
+
+    public function adminHome()
     {
-        return view('home');
+        return view('adminHome');
+
     }
 }

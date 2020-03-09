@@ -1,40 +1,28 @@
 @extends('master')
 @section('main-content')
-         
-		<div class="icons">
-            <a href="#" class="icons-btn d-inline-block js-search-open"><span class="icon-search"></span></a>
-            <a href="cart.html" class="icons-btn d-inline-block bag">
-              <span class="icon-shopping-bag"></span>
-              <span class="number">2</span>
-            </a>
-            <a href="#" class="site-menu-toggle js-menu-toggle ml-3 d-inline-block d-lg-none"><span
-                class="icon-menu"></span></a>
-          </div>
+  <div class="bg-light py-3">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 mb-0">
+          <a href="/index">Home</a>
+          <span class="mx-2 mb-0">/</span>
+          <strong class="text-black">Thank You</strong>
         </div>
       </div>
     </div>
-
-    <div class="bg-light py-3">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-12 mb-0"><a href="index.html">Home</a> <span class="mx-2 mb-0">/</span> <strong
-              class="text-black">Thank You</strong></div>
+  </div>
+  <div class="site-section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <span class="icon-check_circle display-3 text-success"></span>
+          <h2 class="display-3 text-black">Thank you!</h2>
+          <p class="lead mb-5">You order was successfuly completed.</p>
+          <p>
+            <a href="store" class="btn btn-md height-auto px-4 py-3 btn-primary">Back to store</a>
+          </p>
         </div>
       </div>
     </div>
-    
-    <div class="site-section">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-12 text-center">
-            <span class="icon-check_circle display-3 text-success"></span>
-            <h2 class="display-3 text-black">Thank you!</h2>
-            <p class="lead mb-5">You order was successfuly completed.</p>
-            <p><a href="store" class="btn btn-md height-auto px-4 py-3 btn-primary">Back to store</a></p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-   @endsection
+  </div>
+@endsection

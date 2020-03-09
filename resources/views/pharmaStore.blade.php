@@ -1,137 +1,188 @@
 @extends('master')
+
+@section('search-bar')
+  <script>
+  function loadMedicines(letters){
+      $.ajax({
+        url:"{{route ('filteredMedicines')}}",
+        method:"GET",
+        data:{letters:letters,storeORcart:'store'},
+        success:function(result){
+          $('.medicines_area').remove();
+          $('#load_product').html(result);
+        }
+      });
+  }
+  function loadLetters(index){
+      let letters=index.value;
+      loadMedicines(letters);
+  }
+  </script>
+  <a href="#" class="icons-btn d-inline-block js-search-open">
+    <span class="icon-search"></span>
+  </a>
+@endsection
+
 @section('main-content')
- 
-        
-          <div class="icons">
-            <a href="#" class="icons-btn d-inline-block js-search-open"><span class="icon-search"></span></a>
-            <a href="pharmaCart" class="icons-btn d-inline-block bag">
-              <span class="icon-shopping-bag"></span>
-              <span class="number">2</span>
-            </a>
-            <a href="#" class="site-menu-toggle js-menu-toggle ml-3 d-inline-block d-lg-none"><span
-                class="icon-menu"></span></a>
-          </div>
+  <?php
+    $minimum_range=0;
+    $maximum_range=5000;
+  ?>
+  <script>
+    let counter=0;
+    $(document).ready(function(){
+      //add new medicine to cart in store and shopsingle pages
+      function addToCart(medicineID){
+        $.ajax({
+          url:"{{route ('addNewItemToCart')}}",
+          method:"GET",
+          data:{medicineID:medicineID},
+          success:function(carts){
+            $('#numberOfItemsInCart').html(carts);
+          }
+        });
+      }
+      //price range filter in store page
+      $('#price_range').slider({
+        range:true,
+        //start range
+        min:0,
+        //end range
+        max:5000,
+        values:[<?php echo $minimum_range; ?>,<?php echo $maximum_range; ?>],
+        slide:function(event, ui){
+          $("#minimum_range").val(ui.values[0]);
+          $("#maximum_range").val(ui.values[1]);
+          //function call
+          load_product(ui.values[0], ui.values[1]);
+        }
+      });
+      function load_product(minimum_range, maximum_range){
+        $.ajax({
+          url:"{{route ('priceRange')}}",
+          method:"GET",
+          //data sent to controller
+          data:{minimum_range:minimum_range, maximum_range:maximum_range},
+          success:function(medicines){
+            $('.medicines_area').remove();
+            $('#load_product').html(medicines);
+          }
+        });
+      }
+    });
+
+    //when the user clicks on div, open the popu
+    //normal page
+    function popupMessage(index){
+      //get medicine id
+      let alertHere=index.parentNode.parentNode.childNodes[7].childNodes[1].childNodes[2].id;
+      //get this div
+      var popup=document.getElementById(alertHere);
+      //show message
+      popup.classList.toggle("show");
+      //every second show message
+      var hideMessage=setInterval(hideMessage, 1500);
+      function hideMessage(){
+        //hide message
+        popup.classList.toggle("show");
+        // popup.fadeOut("slow");
+        //stop showing message
+        clearInterval(hideMessage);
+      }
+    }
+    //search page
+    function popupMessageSearch(index){
+      let alertHere=index.parentNode.childNodes[0].childNodes[1].id;
+      var popup=document.getElementById(alertHere);
+      popup.classList.toggle("show");
+      var hideMessage=setInterval(hideMessage, 1500);
+      function hideMessage(){
+        popup.classList.toggle("show");
+        clearInterval(hideMessage);
+      }
+    } 
+
+  </script>
+  <div class="bg-light py-3">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 mb-0">
+          <a href="/index">Home</a>
+          <span class="mx-2 mb-0">/</span>
+          <strong class="text-black">Store</strong>
         </div>
       </div>
     </div>
-
-    <div class="bg-light py-3">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-12 mb-0"><a href="index.html">Home</a> <span class="mx-2 mb-0">/</span> <strong class="text-black">Store</strong></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="site-section">
-      <div class="container">
-        
-        <div class="row">
-          <div class="col-lg-6">
-            <h3 class="mb-3 h6 text-uppercase text-black d-block">Filter by Price</h3>
-            <div id="slider-range" class="border-primary"></div>
-            <input type="text" name="text" id="amount" class="form-control border-0 pl-0 bg-white" disabled="" />
-          </div>
-          <div class="col-lg-6">
-            <h3 class="mb-3 h6 text-uppercase text-black d-block">Filter by Reference</h3>
-            <button type="button" class="btn btn-secondary btn-md dropdown-toggle px-4" id="dropdownMenuReference"
-              data-toggle="dropdown">Reference</button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuReference">
-              <a class="dropdown-item" href="#">Relevance</a>
-              <a class="dropdown-item" href="#">Name, A to Z</a>
-              <a class="dropdown-item" href="#">Name, Z to A</a>
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="#">Price, low to high</a>
-              <a class="dropdown-item" href="#">Price, high to low</a>
+  </div>
+  <div class="site-section">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-9">
+          <h3 class="mb-3 h6 text-uppercase text-black d-block">Filter by Price</h3>
+          <div class="row">
+            <div class="col-lg-2 text-center">
+              <input type="text" name="minimum_range" id="minimum_range" class="form-control removeBorder" value="<?php echo $minimum_range; ?>"/>
+            </div>
+            <div class="col-lg-7">
+              <div class="slider_range" style="padding-top:12px">
+                <div id="price_range"></div>
+              </div>
+            </div>
+            <div class="col-lg-3 text-center">
+              <input type="text" name="maximum_range" id="maximum_range" class="form-control removeBorder" value="<?php echo $maximum_range; ?>"/>
             </div>
           </div>
         </div>
-    
-        <div class="row">
-          <div class="col-sm-6 col-lg-4 text-center item mb-4">
-            <span class="tag">Sale</span>
-            <a href="shop-single.html"> <img src="images/product_01.png" alt="Image"></a>
-            <h3 class="text-dark"><a href="shop-single.html">Bioderma</a></h3>
-            <p class="price"><del>95.00</del> &mdash; $55.00</p>
-			 <a href="cart" class="btn btn-primary px-4 py-3">Buy</a>
-          </div>
-          <div class="col-sm-6 col-lg-4 text-center item mb-4">
-            <a href="shop-single.html"> <img src="images/product_02.png" alt="Image"></a>
-            <h3 class="text-dark"><a href="shop-single.html">Chanca Piedra</a></h3>
-            <p class="price">$70.00</p>
-			 <a href="cart" class="btn btn-primary px-4 py-3">Buy</a>
-          </div>
-          <div class="col-sm-6 col-lg-4 text-center item mb-4">
-            <a href="shop-single.html"> <img src="images/product_03.png" alt="Image"></a>
-            <h3 class="text-dark"><a href="shop-single.html">Umcka Cold Care</a></h3>
-            <p class="price">$120.00</p>
-			 <a href="cart" class="btn btn-primary px-4 py-3">Buy</a>
-          </div>
-    
-          <div class="col-sm-6 col-lg-4 text-center item mb-4">
-    
-            <a href="shop-single.html"> <img src="images/product_04.png" alt="Image"></a>
-            <h3 class="text-dark"><a href="shop-single.html">Cetyl Pure</a></h3>
-            <p class="price"><del>45.00</del> &mdash; $20.00</p>
-			 <a href="cart" class="btn btn-primary px-4 py-3">Buy</a>
-          </div>
-          <div class="col-sm-6 col-lg-4 text-center item mb-4">
-            <a href="shop-single.html"> <img src="images/product_05.png" alt="Image"></a>
-            <h3 class="text-dark"><a href="shop-single.html">CLA Core</a></h3>
-            <p class="price">$38.00</p>
-			 <a href="cart" class="btn btn-primary px-4 py-3">Buy</a>
-          </div>
-          <div class="col-sm-6 col-lg-4 text-center item mb-4">
-            <span class="tag">Sale</span>
-            <a href="shop-single.html"> <img src="images/product_06.png" alt="Image"></a>
-            <h3 class="text-dark"><a href="shop-single.html">Poo Pourri</a></h3>
-            <p class="price"><del>$89</del> &mdash; $38.00</p>
-			 <a href="cart" class="btn btn-primary px-4 py-3">Buy</a>
-          </div>
-
-          <div class="col-sm-6 col-lg-4 text-center item mb-4">
-            <span class="tag">Sale</span>
-            <a href="shop-single.html"> <img src="images/product_01.png" alt="Image"></a>
-            <h3 class="text-dark"><a href="shop-single.html">Bioderma</a></h3>
-            <p class="price"><del>95.00</del> &mdash; $55.00</p>
-			 <a href="cart" class="btn btn-primary px-4 py-3">Buy</a>
-          </div>
-          <div class="col-sm-6 col-lg-4 text-center item mb-4">
-            <a href="shop-single.html"> <img src="images/product_02.png" alt="Image"></a>
-            <h3 class="text-dark"><a href="shop-single.html">Chanca Piedra</a></h3>
-            <p class="price">$70.00</p>
-			 <a href="cart" class="btn btn-primary px-4 py-3">Buy</a>
-          </div>
-          <div class="col-sm-6 col-lg-4 text-center item mb-4">
-            <a href="shop-single.html"> <img ˀsrc="images/product_03.png" alt="Image"></a>
-            <h3 class="text-dark"><a href="shop-single.html">Umcka Cold Care</a></h3>
-            <p class="price">$120.00</p>
-			 <a href="cart" class="btn btn-primary px-4 py-3">Buy</a>
-          </div>
-          
-          <div class="col-sm-6 col-lg-4 text-center item mb-4">
-          
-            <a href="shop-single.html"> <img src="images/product_04.png" alt="Image"></a>
-            <h3 class="text-dark"><a href="shop-single.html">Cetyl Pure</a></h3>
-            <p class="price"><del>45.00</del> &mdash; $20.00</p>
-			 <a href="cart" class="btn btn-primary px-4 py-3">Buy</a>
-          </div>
-          <div class="col-sm-6 col-lg-4 text-center item mb-4">
-            <a href="shop-single.html"> <img src="images/product_05.png" alt="Image"></a>
-            <h3 class="text-dark"><a href="shop-single.html">CLA Core</a></h3>
-            <p class="price">$38.00</p>
-			 <a href="cart" class="btn btn-primary px-4 py-3">Buy</a>
-          </div>
-          <div class="col-sm-6 col-lg-4 text-center item mb-4">
-            <span class="tag">Sale</span>
-            <a href="shop-single.html"> <img src="images/product_06.png" alt="Image"></a>
-            <h3 class="text-dark"><a href="shop-single.html">Poo Pourri</a></h3>
-            <p class="price"><del>$89</del> &mdash; $38.00</p>
-			 <a href="cart" class="btn btn-primary px-4 py-3">Buy</a>
+        <div class="col-lg-3">
+          <h3 class="mb-3 h6 text-uppercase text-black d-block">Filter by Reference</h3>
+          <button type="button" class="btn btn-secondary btn-md dropdown-toggle px-4" id="dropdownMenuReference"
+            data-toggle="dropdown">Reference</button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuReference">
+            <a class="dropdown-item" href="/store">Relevance</a>
+            <a class="dropdown-item" href="/a_zOrder">Name, A to Z</a>
+            <a class="dropdown-item" href="/z_aOrder">Name, Z to A</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="/low_highPrice">Price, low to high</a>
+            <a class="dropdown-item" href="/high_lowPrice">Price, high to low</a>
           </div>
         </div>
-        
+      </div>
+    </div>
+  </div>
+  <div id="load_product"></div>
+  <div class="container medicines_area">
+    <div class="row">
+      @foreach($medicines as $medicine)
+        <div class="col-sm-4 col-lg-4 text-center item mb-4 allMedicineInfo">
+          <div class="row">
+            <img src="/img/{{$medicine->medicine_image}}" alt="Image" height="400px">
+          </div>
+          <div class="row">
+            <h3 class="text-dark">{{$medicine->medicine_name}}</h3>
+          </div>
+          <div class="row">
+            <p class="price">{{$medicine->medicine_price}} L.E</p>
+          </div>
+          <div class="row">
 
-    
-   
+            <div class="popup" onclick="popupMessage(this)"><button class="btn btn-warning px-4 py-3" onclick="addToCart({{$medicine->id}})">Add To Cart</button>
+              <span class="popuptext">Added To Cart!</span>
+              <script>
+                //show popup here
+                $(".allMedicineInfo .popup:last span").attr({id:"myPopup"+counter});
+                counter++;
+              </script>
+            </div>
+
+            <a href="/shopSingle/{{$medicine->id}}" class="btn btn-primary px-4 py-3">Show</a>
+          </div>
+
+        </div>
+      @endforeach
+    </div>
+  </div>
+  <br><br>
+  <div class="blocktext">
+    {{$medicines->links()}}
+  </div>
 @endsection

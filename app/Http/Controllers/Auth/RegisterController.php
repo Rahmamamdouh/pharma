@@ -7,6 +7,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use App\Pharmacist;
+use DB;
+
 
 class RegisterController extends Controller
 {
@@ -63,10 +66,30 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+        //default usertype
+        $usertype='user';
+        $ifExist=Pharmacist::where('pharmacist_email',$data['email'])->pluck('id');
+        $countExist=count($ifExist);
+        if($countExist>0){
+            $usertype='pharmacist';
+        }
+        $user=new User(); 
+        $user->name=$data['name'];
+        $user->email=$data['email'];
+        $user->password=Hash::make($data['password']);
+        $user->usertype=$usertype;
+        $user->save();
+        if($countExist>0){
+            //update user_id in pharmacist table
+            $lastRowOfUserTable=User::orderBy('id', 'desc')->first()->id;
+            $userID=DB::table('pharmacists')->where('pharmacist_email',$data['email'])->update(['user_id'=>$lastRowOfUserTable]);
+        }
+        // return User::create([
+        //     'name' => $data['name'],
+        //     'email' => $data['email'],
+        //     'password' => Hash::make($data['password']),
+        //     'usertype' => [$usertype],
+        // ]);
+        return $user;
     }
 }
