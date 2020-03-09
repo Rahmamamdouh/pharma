@@ -151,15 +151,21 @@ class pharmaController extends Controller
         $delivery->delivery_date=date('Y-m-d');
         //hours:minutes:seconds
         $delivery->delivery_time=date('H:i:s');
-        //save phramacist id if time is before midnight and after 6am
+        //save admin id if time is before midnight and after 6am
         if(!(date('H')>"00" && date('H')<"06")){
-	        //pharmacist log in id
-			$pharmacistLoginID=Auth::id();
-			//if no pharmacist is logged into system through work hours
-			if($pharmacistLoginID!='null'){
+	        //admin log in id
+			$loginID=Auth::id();
+			//admin is logged into system through work hours
+			if($loginID!='null'){
 				//pharmacist id
-				$pharmacistID=(DB::table('pharmacists')->where('user_id',$pharmacistLoginID)->pluck('id'))[0];
-		        $delivery->pharmacist_id=$pharmacistID;
+				if((Auth::user()->usertype)=='pharmacist'){
+					$id=(DB::table('pharmacists')->where('user_id',$loginID)->pluck('id'))[0];
+					$delivery->pharmacist_id=$id;
+				}
+				//manager id
+		        elseif((Auth::user()->usertype)=='admin'){
+		        	$delivery->pharmacist_id=$loginID;
+		        }
 	    	}
         }
         $delivery->customer_id=$lastRowOfCustomerTable;
@@ -189,7 +195,7 @@ class pharmaController extends Controller
 	            $deliverylist->save();
 	            //delete bought medicines from store
 	            $delFromStore=Store::where('medicine_id',$cart->medicine_id)->first();
-	            // $delFromStore->delete();
+	            $delFromStore->delete();
 	            $quantity--;
         	}
         	$counter++;
