@@ -7,7 +7,7 @@
           <div class="text-center">
             <h1 style="font-size: 100px; color: black">About Us</h1>
             <h3 style="font-size: 30px; color: black">
-              Pharmacy industry is one of the most strictly monitored and controlled industry. Our pharmacists and pharmacy providers also maintain the same high standard in their operations. Therfor, pharmacy staff is our most important resource.
+              Pharmacy industry is one of the most strictly monitored and controlled industries. Our pharmacists maintain the same high standard in their operations. Therefore, pharmacy staff is our most important resource.
             </h3>
           </div>
         </div>
