@@ -5,7 +5,7 @@
       <div class="row">
         <div class="col-lg-7 mx-auto order-lg-2 align-self-center">
           <div class="site-block-cover-content text-center">
-            <h2 class="sub-title" style="font-size: 20px; color: white; background: black">Effective Medicine, New Medicine Everyday</h2>
+            <h2 class="sub-title" style="font-size: 20px; color: white; background: black">Effective Medicine, New Medicine Everyday.</h2>
             <h1 style="font-size: 100px; color: black">Welcome To Pharma</h1>
           </div>
         </div>
