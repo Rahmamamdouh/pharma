@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head> 
   <title>Pharma</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -213,9 +213,11 @@
               <ul class="site-menu js-clone-nav d-none d-lg-block">
                 <li class="active"><a href="/index">Home</a></li>
                 <li><a href="/about">About</a></li>
-				<li><a href="/service">Service</a></li>
+				        <li><a href="/service">Service</a></li>
                 <li><a href="/store">Store</a></li>
-                <li><a href="/cart">cart</a></li>
+                @if(Auth::user())
+                  <li><a href="/cart">cart</a></li>
+                @endif
                 {{-- <li class="has-children">
                   <a href="#">Dropdown</a>
                   <ul class="dropdown">
@@ -233,23 +235,25 @@
                     <li><a href="#">Tea &amp; Coffee</a></li>
                   </ul>
                 </li> --}}
-        				@guest
+        			@guest
             			<li><a href="/register">Register</a></li>
             			<li><a href="/login">Login</a></li>
             		@else
             			<li><a href="/login">Logout</a></li>
-                @endguest
+                    @endguest
               </ul>
             </nav>
           </div>
-		      <div class="icons">
+		  <div class="icons">
             <!-- search icon -->
             @yield('search-bar')
             <!-- cart icon -->
-            <a href="/cart" class="icons-btn d-inline-block bag">
-              <span class="icon-shopping-bag"></span>
-              <span class="number" id="numberOfItemsInCart"></span>
-            </a>
+            @if(Auth::user())
+              <a href="/cart" class="icons-btn d-inline-block bag">
+                <span class="icon-shopping-bag"></span>
+                <span class="number" id="numberOfItemsInCart"></span>
+              </a>
+            @endif
             <!-- menu icon -->
             <a href="#" class="site-menu-toggle js-menu-toggle ml-3 d-inline-block d-lg-none">
               <span class="icon-menu"></span>
