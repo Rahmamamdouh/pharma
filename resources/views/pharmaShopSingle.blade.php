@@ -46,11 +46,13 @@
             <strong class="text-primary h4">{{$medicine->medicine_price}} LE</strong>
           </p>
           <!-- popup message -->
-          <p>
-            <div class="popup" onclick="popupMessage(this)"><button class="btn btn-warning px-4 py-3" onclick="addToCart({{$medicine->id}})">Add To Cart</button>
-              <span class="popuptext" id="myPopup">Added To Cart!</span>
-            </div>
-          </p>
+          @if(Auth::user())
+            <p>
+              <div class="popup" onclick="popupMessage(this)"><button class="btn btn-warning px-4 py-3" onclick="addToCart({{$medicine->id}})">Add To Cart</button>
+                <span class="popuptext" id="myPopup">Added To Cart!</span>
+              </div>
+            </p>
+          @endif
         </div>
       </div>
     </div>
