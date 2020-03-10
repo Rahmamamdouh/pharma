@@ -71,11 +71,19 @@
       }
     });
 
-    //when the user clicks on div, open the popu
+    //when the user clicks on div, open the popup
     //normal page
     function popupMessage(index){
       //get medicine id
       let alertHere=index.parentNode.parentNode.childNodes[7].childNodes[1].childNodes[2].id;
+      showPopupMessage(alertHere);
+    }
+    //search page
+    function popupMessageSearch(index){
+      let alertHere=index.parentNode.childNodes[0].childNodes[1].id;
+      showPopupMessage(alertHere);
+    }
+    function showPopupMessage(alertHere){
       //get this div
       var popup=document.getElementById(alertHere);
       //show message
@@ -90,17 +98,6 @@
         clearInterval(hideMessage);
       }
     }
-    //search page
-    function popupMessageSearch(index){
-      let alertHere=index.parentNode.childNodes[0].childNodes[1].id;
-      var popup=document.getElementById(alertHere);
-      popup.classList.toggle("show");
-      var hideMessage=setInterval(hideMessage, 1500);
-      function hideMessage(){
-        popup.classList.toggle("show");
-        clearInterval(hideMessage);
-      }
-    } 
 
   </script>
   <div class="bg-light py-3">
@@ -116,6 +113,19 @@
   </div>
   <div class="site-section">
     <div class="container">
+      <div class="row">
+        <div class="col-lg-12" align=center>
+          @if(!Auth::user())
+            <div class="text-center">
+              <h2>You Must Login To Start Shopping..</h2>
+              <a href="/login">
+                <button style="width: 200px; margin: auto; font-size: 20px" class="btn btn-primary btn-md btn-block">Login</button>
+              </a>
+              <br>
+            </div>
+          @endif
+        </div>
+      </div>
       <div class="row">
         <div class="col-lg-9">
           <h3 class="mb-3 h6 text-uppercase text-black d-block">Filter by Price</h3>
@@ -164,16 +174,16 @@
             <p class="price">{{$medicine->medicine_price}} L.E</p>
           </div>
           <div class="row">
-
-            <div class="popup" onclick="popupMessage(this)"><button class="btn btn-warning px-4 py-3" onclick="addToCart({{$medicine->id}})">Add To Cart</button>
-              <span class="popuptext">Added To Cart!</span>
-              <script>
-                //show popup here
-                $(".allMedicineInfo .popup:last span").attr({id:"myPopup"+counter});
-                counter++;
-              </script>
-            </div>
-
+            @if(Auth::user())
+              <div class="popup" onclick="popupMessage(this)"><button class="btn btn-warning px-4 py-3" onclick="addToCart({{$medicine->id}})">Add To Cart</button>
+                <span class="popuptext">Added To Cart!</span>
+                <script>
+                  //show popup here
+                  $(".allMedicineInfo .popup:last span").attr({id:"myPopup"+counter});
+                  counter++;
+                </script>
+              </div>
+            @endif
             <a href="/shopSingle/{{$medicine->id}}" class="btn btn-primary px-4 py-3">Show</a>
           </div>
 
