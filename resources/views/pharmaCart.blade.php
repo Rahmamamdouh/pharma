@@ -42,7 +42,7 @@
   <div align=center>
     <div class="alert alert-warning alert-block text-center" style="width: 800px">
         <button type="button" class="close" data-dismiss="alert">×</button>
-          <strong>{{ $message }}</strong>
+        <strong>{{ $message }}</strong>
     </div>
   </div>
   @endif
