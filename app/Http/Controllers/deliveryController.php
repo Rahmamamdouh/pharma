@@ -143,8 +143,8 @@ class deliveryController extends Controller
                 $medicinePrice=Medicine::all()->where('id', $singleMedicineID)->first()->medicine_price;
                 $totalprice+=$medicinePrice;
 
-                // $store = Store::all()->find($medicineStore);
-                // $store->delete();
+                $store=Store::all()->find($medicineStore);
+                $store->delete();
             }
             $counter++;
         }
