@@ -78,7 +78,7 @@ class pharmaController extends Controller
 
 	public function checkout(){
 		//check if there is enough medicine quantity in store
-		$carts=Cart::all();
+		$carts=Cart::where('user_id',Auth::user()->id)->get();
 		$flag='false';
 		$message='';
         foreach ($carts as $cart){
@@ -173,7 +173,7 @@ class pharmaController extends Controller
         $delivery->save();
 
         //save medicines from cart into deliverylist
-        $carts=Cart::all();
+        $carts=Cart::where('user_id',Auth::user()->id)->get();
         //delivery id
 		$lastRowOfDeliveryTable=Delivery::orderBy('id', 'desc')->first()->id;
 
@@ -207,7 +207,8 @@ class pharmaController extends Controller
         $delivery=DB::table('deliveries')->where('id',$lastRowOfDeliveryTable)->update(['delivery_list'=>$delivery_list_array]);
 
         //empty cart for next order
-        DB::table('carts')->delete();
+        // $this->emptyCart();
+        DB::table('carts')->where('user_id',Auth::user()->id)->delete();
         
 		return redirect('/thankyou');
 	}
@@ -237,10 +238,10 @@ class pharmaController extends Controller
         	$medicineImage=$medicine->medicine_image;
         	$medicineArray[$medicine->id]=['name'=>$medicineName,'image'=>$medicineImage];
         }
-        $carts=Cart::all();
-        $numberOfItemsInCart=DB::table('carts')->count();
+        $carts=Cart::where('user_id',Auth::user()->id)->get();
+        $numberOfItemsInCart=DB::table('carts')->where('user_id',Auth::user()->id)->count();
         //calculate total cart price
-        $totalPrice=DB::table('carts')->pluck('cart_total_price')->sum();
+        $totalPrice=DB::table('carts')->where('user_id',Auth::user()->id)->pluck('cart_total_price')->sum();
 		return view('pharmaCart',compact('carts','medicines','medicineArray','totalPrice','numberOfItemsInCart'));
 	}
 
@@ -253,7 +254,7 @@ class pharmaController extends Controller
 
 	//delete all medicines from cart
 	public function emptyCart(){
-		DB::table('carts')->delete();
+		DB::table('carts')->where('user_id',Auth::user()->id)->delete();
         return redirect('/cart');
 	}
 
@@ -262,7 +263,7 @@ class pharmaController extends Controller
 		//highest price
 		// $maxPrice=Medicine::orderBy('medicine_price','desc')->pluck('medicine_price')->first();
 		//number of medicines in cart
-		$carts=DB::table('carts')->count();
+		$carts=DB::table('carts')->where('user_id',Auth::user()->id)->count();
 		//return result
 		return response()->json($carts);
 	}
@@ -312,9 +313,11 @@ class pharmaController extends Controller
 	        $html.='<p class="price">'.$medicine->medicine_price.' L.E</p>';
 	        $html.='</div>';
 	        $html.='<div class="row">';
-	        $html.='<div class="popup" onclick="popupMessageSearch(this)"><button class="btn btn-warning px-4 py-3" onclick="addToCart('.$medicine->id.')">Add To Cart</button>';
-	        $html.='<span class="popuptext" id="myPopup'.$counter.'">Added To Cart!</span>';
-	        $html.='</div>';
+	        if(Auth::user()){
+	        	$html.='<div class="popup" onclick="popupMessageSearch(this)"><button class="btn btn-warning px-4 py-3" onclick="addToCart('.$medicine->id.')">Add To Cart</button>';
+	        	$html.='<span class="popuptext" id="myPopup'.$counter.'">Added To Cart!</span>';
+	        	$html.='</div>';
+	        }
 	        $html.='<a href="/shopSingle/'.$medicine->id.'" class="btn btn-primary px-4 py-3">Show</a>';
 	        $html.='</div>';
 	        $html.='</div>';
@@ -368,26 +371,47 @@ class pharmaController extends Controller
 		//medicine id
 		$id=$request->get('medicineID');
 		//check if medicine exist in cart
-		$ifMedicineInCart=DB::table('carts')->where('medicine_id','=',$id)->count();
+		// $matchThese = ['user_id' => Auth::user()->id, 'medicine_id' => $id];
+		$ifMedicineInCart=DB::table('carts')->where('medicine_id',$id)->count();
+		//user id where this medicine belongs also to them
+		$users=DB::table('carts')->where('medicine_id',$id)->pluck('user_id');
+		//put result in array form to use it later
+		$counter=0;
+		foreach ($users as $user) {
+			$allUsers[$counter]=$user;
+			$counter++;
+		}
+		//get medicine price from medicine table
+		$medicinePrice=(Medicine::where('id','=',$id)->pluck('medicine_price'))[0];
 		//medicine doesn't exist in cart
 		if($ifMedicineInCart==0){
-			//get medicine price from medicine table
-			$medicinePrice=(Medicine::where('id','=',$id)->pluck('medicine_price'))[0];
 			//save medicine into cart
 			$cart=new Cart();
 			$cart->medicine_id=$id;
 			$cart->cart_quantity=1;
 			$cart->cart_single_price=$medicinePrice;
-			$cart->cart_total_price=($cart->cart_quantity)*$medicinePrice;
+			$cart->cart_total_price=$medicinePrice;
+			$cart->user_id=Auth::user()->id;
 			$cart->save();
 		}
-		//medicine exist in cart
+		//medicine exist in cart with another user
+		elseif(!(in_array(Auth::user()->id, $allUsers))){
+			//save medicine into cart
+			$cart=new Cart();
+			$cart->medicine_id=$id;
+			$cart->cart_quantity=1;
+			$cart->cart_single_price=$medicinePrice;
+			$cart->cart_total_price=$medicinePrice;
+			$cart->user_id=Auth::user()->id;
+			$cart->save();
+		}
+		//medicine exist in cart with current user
 		else{
 			//add to medicine quantity and update total price
 			$this->CartQuantity($id,'plus');
 		}
 		//return total medicine quantity in cart
-		$carts=DB::table('carts')->count();
+		$carts=DB::table('carts')->where('user_id',Auth::user()->id)->count();
 		return response()->json($carts);
 	}
 
@@ -415,7 +439,7 @@ class pharmaController extends Controller
 			$medicineTotalPrice=$this->CartQuantity($medicineID,'plus');	
 		}
 		//calculate total cart price
-		$totalPrice=DB::table('carts')->pluck('cart_total_price')->sum();
+		$totalPrice=DB::table('carts')->where('user_id',Auth::user()->id)->pluck('cart_total_price')->sum();
 		//return result
 		$response=[
 		    'totalPrice' => $totalPrice,
@@ -426,22 +450,22 @@ class pharmaController extends Controller
 	}
 	public function CartQuantity($medicineID,$minusORplus){
 		//get current quantity from cart table
-		$cart=DB::table('carts')->where('medicine_id','=',$medicineID)->pluck('cart_quantity');
+		$cart=DB::table('carts')->where('medicine_id','=',$medicineID)->where('user_id',Auth::user()->id)->pluck('cart_quantity');
 		//remove from medicine quantity
 		if($minusORplus=='minus'){
-			$cart=DB::table('carts')->where('medicine_id','=',$medicineID)->update(['cart_quantity'=>$cart[0]-1]);
+			$cart=DB::table('carts')->where('medicine_id','=',$medicineID)->where('user_id',Auth::user()->id)->update(['cart_quantity'=>$cart[0]-1]);
 		}
 		//add to medicine quantity
 		else{
-			$cart=DB::table('carts')->where('medicine_id','=',$medicineID)->update(['cart_quantity'=>$cart[0]+1]);
+			$cart=DB::table('carts')->where('medicine_id','=',$medicineID)->where('user_id',Auth::user()->id)->update(['cart_quantity'=>$cart[0]+1]);
 		}
 		//get updatted quantity from cart table
-		$currentQuantity=DB::table('carts')->where('medicine_id','=',$medicineID)->pluck('cart_quantity');
+		$currentQuantity=DB::table('carts')->where('medicine_id','=',$medicineID)->where('user_id',Auth::user()->id)->pluck('cart_quantity');
 		//get medicine price from cart table
-		$medicinePrice=DB::table('carts')->where('medicine_id','=',$medicineID)->pluck('cart_single_price');
+		$medicinePrice=DB::table('carts')->where('medicine_id','=',$medicineID)->where('user_id',Auth::user()->id)->pluck('cart_single_price');
 		//calculate then update medicine total price
 		$medicineTotalPrice=$currentQuantity[0]*$medicinePrice[0];
-		$current=DB::table('carts')->where('medicine_id','=',$medicineID)->update(['cart_total_price'=>$medicineTotalPrice]);
+		$current=DB::table('carts')->where('medicine_id','=',$medicineID)->where('user_id',Auth::user()->id)->update(['cart_total_price'=>$medicineTotalPrice]);
 		//return result
 		return $medicineTotalPrice;
 	}
