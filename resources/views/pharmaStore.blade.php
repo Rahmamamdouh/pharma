@@ -93,7 +93,6 @@
       function hideMessage(){
         //hide message
         popup.classList.toggle("show");
-        // popup.fadeOut("slow");
         //stop showing message
         clearInterval(hideMessage);
       }
