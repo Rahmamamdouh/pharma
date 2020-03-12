@@ -103,24 +103,41 @@ class medicineController extends Controller
             $medicine->save();
         }
         $medicines=DB::table('medicines')->paginate(6);
-		return view('MedicineTable.viewAllMedicines',compact('medicines','medicineType'));
+
+        //expired medicines
+        $nearlyExpiredMedicines=$this->expireMedicine();
+        $nearlyExpiredMedicines_store=$nearlyExpiredMedicines['stores'];
+        $nearlyExpiredMedicines_medicineArray=$nearlyExpiredMedicines['medicineArray'];
+
+        return view('MedicineTable.viewAllMedicines',compact('medicines','medicineType','nearlyExpiredMedicines_store','nearlyExpiredMedicines_medicineArray'));
 	}
+
+    public function expiredMedicinesPage(){
+        $this->expireMedicine();
+        //expired medicines
+        $result=$this->expireMedicine();
+        $stores=$result['stores'];
+        $medicineArray=$result['medicineArray'];
+        return view('MedicineTable.expiredMedicinesPage',compact('stores','medicineArray'));
+    }
 
     public function expireMedicine(){
         //current date
         $date=date('Y-m-d');
-        //add two monthes to current date
-        $compareDate=date('Y-m-d', strtotime($date. ' + 2 month'));
+        //add 6 monthes to current date
+        $compareDate=date('Y-m-d', strtotime($date. ' + 6 month'));
         // echo $compareDate;
-        //two monthes untill medicine expiry date
+        //6 monthes untill medicine expiry date
         $stores=Store::where('store_expire','<',$compareDate)->get();
+        $arr['stores']=$stores;
         $medicines=Medicine::all();
         $counter=0;
         foreach ($medicines as $medicine){
             $medicineArray[$medicine->id]=$medicine->medicine_name;
             $counter++;
         }
-        return view('MedicineTable.expireMedicine',compact('stores','medicineArray'));
+        $arr['medicineArray']=$medicineArray;
+        return $arr;
     }
 
     public function searchedMedicines(Request $request){
