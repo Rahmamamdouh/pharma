@@ -38,8 +38,6 @@ Route::get('admin/home', 'HomeController@adminHome')->name('admin.home')->middle
 Route::post('/thankyou','pharmaController@insertDelivery');
 
 
-
-
 //start Filtering
 //From A to Z
 Route::get('/a_zOrder','pharmaController@azOrder');
@@ -80,7 +78,7 @@ Route::post('/allMedicines', 'medicineController@saveNewMedicine');
 
 //view all medicines
 Route::get('/allMedicines', 'medicineController@allMedicines');
-Route::get('/expireMedicine', 'medicineController@expireMedicine');
+Route::get('/expiredMedicinesPage', 'medicineController@expiredMedicinesPage');
 
 //search in view all medicines
 Route::get('/searchedMedicines','medicineController@searchedMedicines')->name('searchedMedicines');
