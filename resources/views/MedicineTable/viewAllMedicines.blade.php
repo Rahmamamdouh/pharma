@@ -24,6 +24,22 @@ function loadLetters(index){
 </script>
     <div class="container">
         <br/>
+        @if(count($nearlyExpiredMedicines_store))
+            <div class="alert alert-warning alert-block">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <strong>Whoops!</strong> Some medicines are almost expire.
+                <br/>
+                <ul>
+                    @foreach($nearlyExpiredMedicines_store as $nearlyExpiredMedicine)
+                        <li>
+                            {{ $nearlyExpiredMedicines_medicineArray[$nearlyExpiredMedicine->medicine_id] }}
+                            -
+                            {{ $nearlyExpiredMedicine->store_expire }}
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         <div class="page-header">
             <h1>All Medicines</h1>
             <div class="container">
@@ -35,7 +51,7 @@ function loadLetters(index){
                     </div>
                     <br>
                     <div class="col-xl-3">
-                        <a href="/expireMedicine" class="btn btn-info">
+                        <a href="/expiredMedicinesPage" class="btn btn-info">
                             Nearly Expired Medicines..
                         </a>
                     </div>
